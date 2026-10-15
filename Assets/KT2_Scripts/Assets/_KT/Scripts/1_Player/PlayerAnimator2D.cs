@@ -28,6 +28,8 @@ public class PlayerAnimator2D : KTBehaviour
     [Tooltip("Куда смотрит персонаж на исходной картинке. Снимите галочку, если он нарисован смотрящим влево.")]
     [SerializeField] private bool spriteFacesRight = true;
 
+    public GameObject player;
+
     private static readonly int SpeedHash = Animator.StringToHash("Speed");
     private static readonly int VerticalSpeedHash = Animator.StringToHash("VerticalSpeed");
     private static readonly int IsGroundedHash = Animator.StringToHash("IsGrounded");
@@ -44,6 +46,7 @@ public class PlayerAnimator2D : KTBehaviour
     private bool hasIsGrounded;
     private bool hasMoveX;
     private bool hasMoveY;
+    private bool isMoved = false;
 
     private void Awake()
     {
@@ -110,6 +113,7 @@ public class PlayerAnimator2D : KTBehaviour
     {
         if (spriteToFlip == null) return;
 
+
         if (!flipSprite)
         {
             spriteToFlip.flipX = false;
@@ -119,7 +123,20 @@ public class PlayerAnimator2D : KTBehaviour
         if (Mathf.Abs(lastDirection.x) > 0.01f)
         {
             bool lookingLeft = lastDirection.x < 0f;
-            spriteToFlip.flipX = spriteFacesRight ? lookingLeft : !lookingLeft;
+            //spriteToFlip.flipX = spriteFacesRight ? lookingLeft : !lookingLeft;
+            transform.rotation = Quaternion.Euler(0, lookingLeft ? 180 : 0, 0);
+        
+            if (lookingLeft && !isMoved){
+                transform.position += new Vector3(lookingLeft ? -1f : 0, 0 , 0);
+                Debug.Log("moved");
+                isMoved = true;
+            }
+            
+            if (!lookingLeft && isMoved) {
+                transform.position += new Vector3(!lookingLeft ? 1f : 0, 0 , 0);
+                Debug.Log("moved");
+                isMoved = false;
+            }
         }
         else
         {
